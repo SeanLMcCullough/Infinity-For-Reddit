@@ -36,11 +36,17 @@ class AppAuthLoginViewModel(
     private val _errorMessageId = MutableStateFlow<Int?>(null)
     val errorMessageId = _errorMessageId.asStateFlow()
 
+    // What went wrong when a request failed, e.g. the HTTP status and Reddit's reply.
+    private val _errorDetail = MutableStateFlow<String?>(null)
+    val errorDetail = _errorDetail.asStateFlow()
+
     fun setError(errorMessageId: Int) {
+        _errorDetail.value = null
         _errorMessageId.value = errorMessageId
     }
 
     fun clearError() {
+        _errorDetail.value = null
         _errorMessageId.value = null
     }
 
@@ -66,9 +72,11 @@ class AppAuthLoginViewModel(
                         _accountFetched.value = fetchAccountInfo(accessToken, refreshToken, it)
                     } catch (e: IOException) {
                         e.printStackTrace()
+                        _errorDetail.value = APIUtils.describeFailure(e)
                         _errorMessageId.value = R.string.retrieve_token_error
                     } catch (e: HttpException) {
                         e.printStackTrace()
+                        _errorDetail.value = APIUtils.describeFailure(e)
                         _errorMessageId.value = R.string.retrieve_token_error
                     } catch (e: JSONException) {
                         e.printStackTrace()
@@ -131,9 +139,11 @@ class AppAuthLoginViewModel(
             return true
         } catch (e: IOException) {
             e.printStackTrace()
+            _errorDetail.value = APIUtils.describeFailure(e)
             _errorMessageId.value = R.string.cannot_fetch_user_info
         } catch (e: HttpException) {
             e.printStackTrace()
+            _errorDetail.value = APIUtils.describeFailure(e)
             _errorMessageId.value = R.string.cannot_fetch_user_info
         } catch (e: JSONException) {
             e.printStackTrace()

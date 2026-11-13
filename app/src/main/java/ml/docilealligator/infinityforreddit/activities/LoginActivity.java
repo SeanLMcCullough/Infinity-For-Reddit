@@ -249,10 +249,15 @@ public class LoginActivity extends BaseActivity {
 
                                                     @Override
                                                     public void onFetchMyInfoFailed(boolean parseFailed) {
+                                                        onFetchMyInfoFailed(parseFailed, null);
+                                                    }
+
+                                                    @Override
+                                                    public void onFetchMyInfoFailed(boolean parseFailed, String detail) {
                                                         if (parseFailed) {
                                                             Toast.makeText(LoginActivity.this, R.string.parse_user_info_error, Toast.LENGTH_SHORT).show();
                                                         } else {
-                                                            Toast.makeText(LoginActivity.this, R.string.cannot_fetch_user_info, Toast.LENGTH_SHORT).show();
+                                                            Toast.makeText(LoginActivity.this, getString(R.string.cannot_fetch_user_info) + (detail == null ? "" : "\n" + detail), Toast.LENGTH_LONG).show();
                                                         }
 
                                                         finish();
@@ -264,14 +269,14 @@ public class LoginActivity extends BaseActivity {
                                         finish();
                                     }
                                 } else {
-                                    Toast.makeText(LoginActivity.this, R.string.retrieve_token_error, Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(LoginActivity.this, getString(R.string.retrieve_token_error) + "\n" + APIUtils.describeFailure(response), Toast.LENGTH_LONG).show();
                                     finish();
                                 }
                             }
 
                             @Override
                             public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
-                                Toast.makeText(LoginActivity.this, R.string.retrieve_token_error, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(LoginActivity.this, getString(R.string.retrieve_token_error) + "\n" + APIUtils.describeFailure(t), Toast.LENGTH_LONG).show();
                                 t.printStackTrace();
                                 finish();
                             }

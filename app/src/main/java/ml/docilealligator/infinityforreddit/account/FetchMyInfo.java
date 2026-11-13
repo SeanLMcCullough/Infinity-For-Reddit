@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.text.Html;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,13 +46,13 @@ public class FetchMyInfo {
                         }
                     });
                 } else {
-                    fetchMyInfoListener.onFetchMyInfoFailed(false);
+                    fetchMyInfoListener.onFetchMyInfoFailed(false, APIUtils.describeFailure(response));
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<String> call, @NonNull Throwable throwable) {
-                fetchMyInfoListener.onFetchMyInfoFailed(false);
+                fetchMyInfoListener.onFetchMyInfoFailed(false, APIUtils.describeFailure(throwable));
             }
         });
     }
@@ -60,5 +61,12 @@ public class FetchMyInfo {
         void onFetchMyInfoSuccess(String name, String profileImageUrl, String bannerImageUrl, int karma, boolean isMod);
 
         void onFetchMyInfoFailed(boolean parseFailed);
+
+        /**
+         * @param detail what went wrong when the request itself failed, e.g. the HTTP status.
+         */
+        default void onFetchMyInfoFailed(boolean parseFailed, @Nullable String detail) {
+            onFetchMyInfoFailed(parseFailed);
+        }
     }
 }

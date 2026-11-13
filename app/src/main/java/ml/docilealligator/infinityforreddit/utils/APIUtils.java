@@ -182,6 +182,34 @@ public class APIUtils {
         return MANIFEST_REDIRECT_URI.equals(REDIRECT_URI);
     }
 
+    /**
+     * Short description of a failed request for error messages, e.g. "HTTP 403: Forbidden".
+     */
+    public static String describeFailure(@Nullable retrofit2.Response<?> response) {
+        if (response == null) {
+            return "no response";
+        }
+        String body = "";
+        try (okhttp3.ResponseBody errorBody = response.errorBody()) {
+            if (errorBody != null) {
+                body = errorBody.string().replaceAll("\\s+", " ").trim();
+            }
+        } catch (java.io.IOException | RuntimeException ignored) {
+        }
+        if (body.length() > 160) {
+            body = body.substring(0, 160) + "...";
+        }
+        return "HTTP " + response.code() + (body.isEmpty() ? "" : ": " + body);
+    }
+
+    public static String describeFailure(@NonNull Throwable throwable) {
+        if (throwable instanceof retrofit2.HttpException) {
+            return describeFailure(((retrofit2.HttpException) throwable).response());
+        }
+        String message = throwable.getMessage();
+        return throwable.getClass().getSimpleName() + (message == null ? "" : ": " + message);
+    }
+
     public static Map<String, String> getHttpBasicAuthHeader() {
         Map<String, String> params = new HashMap<>();
         String credentials = String.format("%s:%s", APIUtils.CLIENT_ID, "");

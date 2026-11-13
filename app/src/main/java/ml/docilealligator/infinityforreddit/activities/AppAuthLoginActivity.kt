@@ -121,6 +121,7 @@ class AppAuthLoginActivity : BaseActivity() {
                 val scrollBehavior = enterAlwaysScrollBehavior()
                 val accountFetched by mViewModel.accountFetched.collectAsStateWithLifecycle()
                 val errorMessageId by mViewModel.errorMessageId.collectAsStateWithLifecycle()
+                val errorDetail by mViewModel.errorDetail.collectAsStateWithLifecycle()
                 var isAgreeToUserAgreement by rememberSaveable { mutableStateOf(false) }
 
                 LaunchedEffect(accountFetched) {
@@ -202,6 +203,13 @@ class AppAuthLoginActivity : BaseActivity() {
                                 it,
                                 textAlign = TextAlign.Center
                             )
+
+                            errorDetail?.let { detail ->
+                                PrimaryText(
+                                    detail,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
                         }
 
                         Spacer(modifier = Modifier.weight(1f))
@@ -279,10 +287,13 @@ class AppAuthLoginActivity : BaseActivity() {
             return
         }
 
-        // An Auth Tab can only hand back a custom scheme redirect. For an http(s) redirect URI such as
-        // http://127.0.0.1, only the WebView can intercept the redirect.
+        // Only infinity://localhost goes through the Auth Tab: it is the one redirect URI declared in
+        // the manifest. Reddit's current consent flow does not hand a redirect back to an ephemeral
+        // Auth Tab (it stops at a 404 on /svc/shreddit/oauth-grant), and an http(s) redirect such as
+        // http://127.0.0.1 can't be caught by a tab either. The WebView intercepts the redirect itself,
+        // for any scheme, so every other redirect URI (e.g. a borrowed redreader://... one) logs in there.
         val redirectScheme = APIUtils.REDIRECT_URI.toUri().scheme
-        if (redirectScheme == null || redirectScheme.equals("http", true) || redirectScheme.equals("https", true)) {
+        if (!APIUtils.isManifestRedirectUri() || redirectScheme == null) {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
             return
