@@ -52,7 +52,7 @@ Infinity for Reddit+ is available on Google Play and GitHub. There’s also a Pa
 
 This is an unofficial fork of [Infinity for Reddit](https://github.com/Docile-Alligator/Infinity-For-Reddit) by [Docile-Alligator](https://github.com/Docile-Alligator). All credit for the app goes to the original developer. If you enjoy it, please support them through the [Donation](#donation) links below.
 
-The fork is for personal use with your own Reddit API client ID. It is not affiliated with the original project and it does not come with any Reddit API credentials.
+The fork is for personal use with Reddit API credentials that you provide. It is not affiliated with the original project and it does not come with any Reddit API credentials.
 
 What is different from the original:
 
@@ -73,18 +73,32 @@ Things to know before installing:
 
 ### Set Up Your API Credentials
 
-You need your own Reddit API app. You can find it at [reddit.com/prefs/apps](https://www.reddit.com/prefs/apps). Its type has to be **installed app**. Reddit has restricted the creation of new API apps, so this fork is mostly useful if you already have one.
+To use the app you need the credentials of a Reddit API app: a **client ID**, a **redirect URI** and a **user agent**. Reddit has stopped issuing new API keys and now blocks many existing third-party keys, so for most people the reliable option is to reuse the credentials of a client that Reddit still allows, such as [RedReader](https://github.com/QuantumBadger/RedReader). This mirrors the approach described in [Apollo Reborn's guide](https://github.com/Apollo-Reborn/Apollo-Reborn#dont-have-an-api-key).
 
-1. Open the app and go to **Settings > API Credentials**.
-2. Fill in the following:
-   - Reddit Client ID: The ID shown under the name of your app at reddit.com/prefs/apps.
-   - Redirect URI: It must match the redirect URI of your Reddit app exactly, e.g. `http://127.0.0.1`.
-   - User Agent: Something that identifies you, e.g. `android:your.app.name:v1.0 (by /u/your_username)`.
-   - Giphy API Key: Optional. Only needed for posting GIFs in comments.
-3. Restart the app.
-4. Tap **Add an account** and log in.
+#### Option A: Reuse RedReader's credentials (recommended)
 
-Your credentials are stored on your device only. They are not included in the settings backup.
+RedReader is an open-source Reddit client that Reddit still permits. You can obtain its client ID yourself without it being published here:
+
+1. Install [RedReader](https://github.com/QuantumBadger/RedReader/releases) (or from F-Droid) and log in with your Reddit account, granting it access.
+2. Reddit sends you an email with the subject **"You've authorized a new app in your Reddit account."** It lists an **App ID** — copy it.
+3. In this app, open **Settings > API Credentials** and enter:
+   - **Reddit Client ID:** the App ID from that email.
+   - **Redirect URI:** `redreader://rr_oauth_redir`
+   - **User Agent:** `RedReader/1.27` (match the version of RedReader you installed).
+   - **Giphy API Key:** optional, only for posting GIFs in comments.
+4. Restart the app, tap **Add an account** and log in. Reddit's consent screen will name RedReader; accept it.
+
+This reuses RedReader's identity with Reddit. It works today but is not guaranteed — Reddit could block it, and it may be against Reddit's terms — so use it for personal use at your own discretion, and please don't abuse it out of respect for the RedReader project.
+
+#### Option B: Use your own API app
+
+If you still have a working Reddit API app (type: **installed app**, found at [reddit.com/prefs/apps](https://www.reddit.com/prefs/apps)), enter its own values under **Settings > API Credentials**:
+
+- **Reddit Client ID:** the ID shown under your app's name.
+- **Redirect URI:** must match your Reddit app exactly, e.g. `http://127.0.0.1`.
+- **User Agent:** something that identifies you, e.g. `android:your.app.name:v1.0 (by /u/your_username)`.
+
+Your credentials are stored on your device only and are not included in the settings backup. After changing them, restart the app and log in again.
 
 ### Versions
 
