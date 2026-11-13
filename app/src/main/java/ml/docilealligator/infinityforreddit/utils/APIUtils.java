@@ -1,5 +1,7 @@
 package ml.docilealligator.infinityforreddit.utils;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.SystemClock;
 import android.util.Base64;
 
@@ -10,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import ml.docilealligator.infinityforreddit.BuildConfig;
 import ml.docilealligator.infinityforreddit.account.Account;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -32,17 +35,20 @@ public class APIUtils {
 
     public static final String CLIENT_ID_KEY = "client_id";
     public static final String CLIENT_SECRET_KEY = "client_secret";
-    public static final String CLIENT_ID = "";
+    // Runtime value, see loadCredentials(). Not final so that it is not inlined at compile time.
+    public static volatile String CLIENT_ID = "";
     public static final String IMGUR_CLIENT_ID = "Client-ID cc671794e0ab397";
     public static final String REDGIFS_CLIENT_ID = "1828d0bcc93-15ac-bde6-0005-d2ecbe8daab3";
     public static final String REDGIFS_CLIENT_SECRET = "TJBlw7jRXW65NAGgFBtgZHu97WlzRXHYybK81sZ9dLM=";
-    public static final String GIPHY_GIF_API_KEY = "";
+    public static volatile String GIPHY_GIF_API_KEY = "";
     public static final String RESPONSE_TYPE_KEY = "response_type";
     public static final String RESPONSE_TYPE = "code";
     public static final String STATE_KEY = "state";
     public static final String STATE = "23ro8xlxvzp4asqd";
     public static final String REDIRECT_URI_KEY = "redirect_uri";
-    public static final String REDIRECT_URI = "infinity://localhost";
+    // The only redirect URI LoginChromeCustomTabActivity can receive (declared in AndroidManifest.xml).
+    public static final String MANIFEST_REDIRECT_URI = "infinity://localhost";
+    public static volatile String REDIRECT_URI = MANIFEST_REDIRECT_URI;
     public static final String DURATION_KEY = "duration";
     public static final String DURATION = "permanent";
     public static final String SCOPE_KEY = "scope";
@@ -52,8 +58,8 @@ public class APIUtils {
     public static final String AUTHORIZATION_KEY = "Authorization";
     public static final String AUTHORIZATION_BASE = "bearer ";
     public static final String USER_AGENT_KEY = "User-Agent";
-    public static final String USER_AGENT = "";
-    public static final String ANONYMOUS_USER_AGENT = "";
+    public static volatile String USER_AGENT = "";
+    public static volatile String ANONYMOUS_USER_AGENT = "";
     public static final String USERNAME_KEY = "username";
 
     public static final String GRANT_TYPE_KEY = "grant_type";
@@ -135,6 +141,46 @@ public class APIUtils {
     public static final String IS_INTERNAL_KEY = "isInternal";
     public static final String CONVERSATION_IDS_KEY = "conversationIds";
     public static final String NUM_HOURS_KEY = "num_hours";
+
+    /**
+     * Loads the Reddit client ID, redirect URI, user agent and Giphy key from the API credentials
+     * preferences, falling back to the defaults baked in at build time (see app/build.gradle).
+     * Must run before any network client is created; called first thing in Infinity.onCreate().
+     */
+    public static void loadCredentials(Context context) {
+        SharedPreferences prefs = context.getApplicationContext().getSharedPreferences(
+                SharedPreferencesUtils.API_CREDENTIALS_SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
+
+        CLIENT_ID = credential(prefs, SharedPreferencesUtils.REDDIT_CLIENT_ID, BuildConfig.DEFAULT_REDDIT_CLIENT_ID);
+        String redirectUri = credential(prefs, SharedPreferencesUtils.REDDIT_REDIRECT_URI, BuildConfig.DEFAULT_REDDIT_REDIRECT_URI);
+        REDIRECT_URI = redirectUri.isEmpty() ? MANIFEST_REDIRECT_URI : redirectUri;
+        String userAgent = credential(prefs, SharedPreferencesUtils.REDDIT_USER_AGENT, BuildConfig.DEFAULT_REDDIT_USER_AGENT);
+        USER_AGENT = userAgent;
+        ANONYMOUS_USER_AGENT = userAgent;
+        GIPHY_GIF_API_KEY = credential(prefs, SharedPreferencesUtils.GIPHY_API_KEY, BuildConfig.DEFAULT_GIPHY_API_KEY);
+    }
+
+    private static String credential(SharedPreferences prefs, String key, String defaultValue) {
+        String value = prefs.getString(key, null);
+        if (value == null || value.trim().isEmpty()) {
+            return defaultValue == null ? "" : defaultValue.trim();
+        }
+        return value.trim();
+    }
+
+    /**
+     * Reddit rejects the OAuth request without a client ID and blocks requests without a user agent.
+     */
+    public static boolean hasRedditCredentials() {
+        return !CLIENT_ID.isEmpty() && !USER_AGENT.isEmpty();
+    }
+
+    /**
+     * Only the WebView login can intercept a redirect URI other than the one in the manifest.
+     */
+    public static boolean isManifestRedirectUri() {
+        return MANIFEST_REDIRECT_URI.equals(REDIRECT_URI);
+    }
 
     public static Map<String, String> getHttpBasicAuthHeader() {
         Map<String, String> params = new HashMap<>();

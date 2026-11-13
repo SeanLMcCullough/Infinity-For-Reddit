@@ -49,6 +49,7 @@ import ml.docilealligator.infinityforreddit.font.TitleFontFamily;
 import ml.docilealligator.infinityforreddit.module.AppComponent;
 import ml.docilealligator.infinityforreddit.module.DaggerAppComponent;
 import ml.docilealligator.infinityforreddit.reminder.ReminderManager;
+import ml.docilealligator.infinityforreddit.utils.APIUtils;
 import ml.docilealligator.infinityforreddit.utils.MaterialYouUtils;
 import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
 import ml.docilealligator.infinityforreddit.utils.Utils;
@@ -95,6 +96,9 @@ public class Infinity extends Application implements LifecycleObserver {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        // Before the component is built so that every network client sees the configured values.
+        APIUtils.loadCredentials(this);
 
         mAppComponent = DaggerAppComponent.factory()
                 .create(this);

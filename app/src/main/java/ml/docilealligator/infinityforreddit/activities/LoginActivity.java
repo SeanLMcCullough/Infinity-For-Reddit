@@ -150,6 +150,18 @@ public class LoginActivity extends BaseActivity {
             isAgreeToUserAgreement = savedInstanceState.getBoolean(IS_AGREE_TO_USER_AGGREMENT_STATE);
         }
 
+        if (!APIUtils.hasRedditCredentials()) {
+            Toast.makeText(this, R.string.login_api_credentials_required, Toast.LENGTH_LONG).show();
+            startActivity(new Intent(this, SettingsActivity.class));
+            finish();
+            return;
+        }
+
+        // The Custom Tab flow can only receive the redirect URI declared in the manifest.
+        if (!APIUtils.isManifestRedirectUri()) {
+            binding.fabLoginActivity.setVisibility(View.GONE);
+        }
+
         binding.webviewLoginActivity.getSettings().setJavaScriptEnabled(true);
 
         String userAgent = binding.webviewLoginActivity.getSettings().getUserAgentString();

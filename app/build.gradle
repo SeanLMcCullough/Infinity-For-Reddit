@@ -14,6 +14,16 @@ android {
         versionCode 233
         versionName "8.3.5"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        // Optional build-time defaults for the values under Settings > API credentials.
+        // Pass with e.g. ./gradlew assembleRelease -PredditClientId=... or leave unset and enter them in the app.
+        def apiCredentialDefault = { String name ->
+            def value = (project.findProperty(name) ?: '').toString()
+            return '"' + value.replace('\\', '\\\\').replace('"', '\\"') + '"'
+        }
+        buildConfigField "String", "DEFAULT_REDDIT_CLIENT_ID", apiCredentialDefault('redditClientId')
+        buildConfigField "String", "DEFAULT_REDDIT_REDIRECT_URI", apiCredentialDefault('redditRedirectUri')
+        buildConfigField "String", "DEFAULT_REDDIT_USER_AGENT", apiCredentialDefault('redditUserAgent')
+        buildConfigField "String", "DEFAULT_GIPHY_API_KEY", apiCredentialDefault('giphyApiKey')
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = [eventBusIndex: 'ml.docilealligator.infinityforreddit.EventBusIndex']

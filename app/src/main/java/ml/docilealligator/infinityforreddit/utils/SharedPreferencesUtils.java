@@ -452,6 +452,12 @@ public class SharedPreferencesUtils {
     public static final String PROXY_HOSTNAME = "proxy_hostname";
     public static final String PROXY_PORT = "proxy_port";
 
+    public static final String API_CREDENTIALS_SHARED_PREFERENCES_FILE = "ml.docilealligator.infinityforreddit.api_credentials";
+    public static final String REDDIT_CLIENT_ID = "reddit_client_id";
+    public static final String REDDIT_REDIRECT_URI = "reddit_redirect_uri";
+    public static final String REDDIT_USER_AGENT = "reddit_user_agent";
+    public static final String GIPHY_API_KEY = "giphy_api_key";
+
     public static final String COOKIE_SHARED_PREFERENCES_FILE = "ml.docilealligator.infinityforreddit.cookie";
 
     //Legacy Settings

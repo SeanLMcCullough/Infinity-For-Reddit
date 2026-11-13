@@ -45,8 +45,13 @@
     <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontPreferenceWithBackground
         app:icon="@drawable/ic_call_split_24"
         app:title="@string/settings_proxy_title"
-        app:bottom="true"
         app:fragment="ml.docilealligator.infinityforreddit.settings.ProxyPreferenceFragment" />
+
+    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontPreferenceWithBackground
+        app:icon="@drawable/ic_key_24"
+        app:title="@string/settings_api_credentials_title"
+        app:bottom="true"
+        app:fragment="ml.docilealligator.infinityforreddit.settings.ApiCredentialsPreferenceFragment" />
 
     <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontPreferenceWithBackground
         app:icon="@drawable/ic_history_day_night_24dp"

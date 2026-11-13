@@ -213,19 +213,32 @@ class AppAuthLoginActivity : BaseActivity() {
                         Spacer(modifier = Modifier.height(16.dp))
 
                         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                            CustomFilledButton(stringResId = R.string.login_using_chrome_custom_tab) {
-                                if (getChromeCustomTabPackageName(context) == null) {
-                                    Toast.makeText(context, R.string.login_chrome_required, Toast.LENGTH_SHORT).show()
-                                } else {
-                                    startActivity(Intent(context, LoginChromeCustomTabActivity::class.java))
-                                    finish()
+                            // The Custom Tab flow can only receive the redirect URI declared in the manifest.
+                            if (APIUtils.isManifestRedirectUri()) {
+                                CustomFilledButton(stringResId = R.string.login_using_chrome_custom_tab) {
+                                    if (!ensureRedditCredentials()) {
+                                        // Sent to the settings.
+                                    } else if (getChromeCustomTabPackageName(context) == null) {
+                                        Toast.makeText(context, R.string.login_chrome_required, Toast.LENGTH_SHORT).show()
+                                    } else {
+                                        startActivity(Intent(context, LoginChromeCustomTabActivity::class.java))
+                                        finish()
+                                    }
                                 }
                             }
 
                             CustomFilledButton(stringResId = R.string.login_using_webview) {
-                                startActivity(Intent(context, LoginActivity::class.java))
-                                finish()
+                                if (ensureRedditCredentials()) {
+                                    startActivity(Intent(context, LoginActivity::class.java))
+                                    finish()
+                                }
                             }
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        CustomFilledButton(stringResId = R.string.login_open_api_credentials) {
+                            startActivity(Intent(context, SettingsActivity::class.java))
                         }
                     }
                 }
@@ -249,7 +262,32 @@ class AppAuthLoginActivity : BaseActivity() {
 
     }
 
+    /**
+     * @return false, after pointing the user to the settings, if no client ID or user agent is set.
+     */
+    private fun ensureRedditCredentials(): Boolean {
+        if (APIUtils.hasRedditCredentials()) {
+            return true
+        }
+        Toast.makeText(this, R.string.login_api_credentials_required, Toast.LENGTH_LONG).show()
+        startActivity(Intent(this, SettingsActivity::class.java))
+        return false
+    }
+
     private fun launchAuthTab() {
+        if (!ensureRedditCredentials()) {
+            return
+        }
+
+        // An Auth Tab can only hand back a custom scheme redirect. For an http(s) redirect URI such as
+        // http://127.0.0.1, only the WebView can intercept the redirect.
+        val redirectScheme = APIUtils.REDIRECT_URI.toUri().scheme
+        if (redirectScheme == null || redirectScheme.equals("http", true) || redirectScheme.equals("https", true)) {
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+            return
+        }
+
         getChromeCustomTabPackageName(this)?.let {
             if (!CustomTabsClient.isAuthTabSupported(this, it)) {
                 startActivity(Intent(this, LoginActivity::class.java))
@@ -267,7 +305,7 @@ class AppAuthLoginActivity : BaseActivity() {
             uriBuilder.appendQueryParameter(APIUtils.SCOPE_KEY, APIUtils.SCOPE)
 
             val authTabIntent = AuthTabIntent.Builder().setEphemeralBrowsingEnabled(true).build()
-            authTabIntent.launch(mLauncher, uriBuilder.build(), "infinity")
+            authTabIntent.launch(mLauncher, uriBuilder.build(), redirectScheme)
         }
     }
 
