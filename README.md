@@ -48,6 +48,50 @@ Infinity for Reddit+ is available on Google Play and GitHub. There’s also a Pa
 
 </div>
 
+## About This Fork
+
+This is an unofficial fork of [Infinity for Reddit](https://github.com/Docile-Alligator/Infinity-For-Reddit) by [Docile-Alligator](https://github.com/Docile-Alligator). All credit for the app goes to the original developer. If you enjoy it, please support them through the [Donation](#donation) links below.
+
+The fork is for personal use with your own Reddit API client ID. It is not affiliated with the original project and it does not come with any Reddit API credentials.
+
+What is different from the original:
+
+- API Credentials settings: Set your own Reddit client ID, redirect URI, user agent and Giphy API key in the app instead of building them into the source code.
+- Login works with any redirect URI, including `http://127.0.0.1`.
+- Prebuilt APKs are published on the [releases page](https://github.com/SeanLMcCullough/Infinity-For-Reddit/releases) of this fork.
+
+### Download and Install
+
+1. Go to the [releases page](https://github.com/SeanLMcCullough/Infinity-For-Reddit/releases) and download the APK file of the latest release. Its name looks like <strong><i>Infinity-8.3.5-r1.apk</i></strong>.
+2. Open the APK file on your phone. Android will ask you to allow installing apps from this source the first time.
+3. Install the app and continue with [Set Up Your API Credentials](#set-up-your-api-credentials).
+
+Things to know before installing:
+
+- This fork uses the same package name as the original Infinity for Reddit, so the two cannot be installed at the same time. Uninstall the original app first. You can back up your settings in **Settings > Advanced** before doing that.
+- The APKs are signed with the public keystore of the Infinity APK Builder, so they install over an APK you built with it. Because that keystore is public, the signature does not prove who built an APK. Only download from the releases page of this fork. Each release also has a `.sha256` file to check your download against.
+
+### Set Up Your API Credentials
+
+You need your own Reddit API app. You can find it at [reddit.com/prefs/apps](https://www.reddit.com/prefs/apps). Its type has to be **installed app**. Reddit has restricted the creation of new API apps, so this fork is mostly useful if you already have one.
+
+1. Open the app and go to **Settings > API Credentials**.
+2. Fill in the following:
+   - Reddit Client ID: The ID shown under the name of your app at reddit.com/prefs/apps.
+   - Redirect URI: It must match the redirect URI of your Reddit app exactly, e.g. `http://127.0.0.1`.
+   - User Agent: Something that identifies you, e.g. `android:your.app.name:v1.0 (by /u/your_username)`.
+   - Giphy API Key: Optional. Only needed for posting GIFs in comments.
+3. Restart the app.
+4. Tap **Add an account** and log in.
+
+Your credentials are stored on your device only. They are not included in the settings backup.
+
+### Versions
+
+Releases are named after the version of the original app they are based on, followed by the build number of this fork. For example, `8.3.5-r2` is the second build of this fork and it is based on Infinity for Reddit 8.3.5.
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
 ### 📱 Also available on iOS
 Infinity for Reddit is finally on iOS! Check it out here: [Infinity for Reddit](https://github.com/foxanastudio/Infinity-For-Reddit-iOS)
 
