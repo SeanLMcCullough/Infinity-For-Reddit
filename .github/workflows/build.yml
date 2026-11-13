@@ -5,6 +5,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Builds code from pull requests, so the token must not be able to write to the repository.
+permissions:
+  contents: read
+
 jobs:
   Build:
     runs-on: ubuntu-latest

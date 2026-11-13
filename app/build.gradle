@@ -13,6 +13,14 @@ android {
         targetSdk 36
         versionCode 233
         versionName "8.3.5"
+        // Set by .github/workflows/release.yml. Kept apart from the two lines above so that
+        // upstream version bumps merge cleanly.
+        if (project.hasProperty('versionCodeOverride')) {
+            versionCode project.property('versionCodeOverride') as int
+        }
+        if (project.hasProperty('versionNameOverride')) {
+            versionName project.property('versionNameOverride').toString()
+        }
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         // Optional build-time defaults for the values under Settings > API credentials.
         // Pass with e.g. ./gradlew assembleRelease -PredditClientId=... or leave unset and enter them in the app.
